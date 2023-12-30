@@ -11,7 +11,7 @@ namespace DuckDNS
 {
     class Program
     {
-        private const string CONFIG_PATH = "../../secrets/duck-dns/duck-dns.json";
+        private const string CONFIG_PATH = "../secrets/duck-dns/duck-dns.json";
         public static int configVersion = 1;
         public static Settings set = new Settings(); //Used all over the place, so it made sense to only have 1.
         static void Main(string[] args)
