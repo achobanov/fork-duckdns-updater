@@ -11,21 +11,26 @@ namespace DuckDNS
 {
     class Program
     {
+        private const string CONFIG_PATH = "../../secrets/duck-dns/duck-dns.json";
         public static int configVersion = 1;
         public static Settings set = new Settings(); //Used all over the place, so it made sense to only have 1.
         static void Main(string[] args)
         {
-            if (File.Exists("duckdns_config.json") == false)
+            if (File.Exists(CONFIG_PATH) == false)
             {
-                CreateConfig();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Config file not fount at '{Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), CONFIG_PATH))}'");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Did you forget to update the secrets submodule?");
+                return;
             }
             else
             {
-                set = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("duckdns_config.json"));
+                set = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(CONFIG_PATH));
                 if (set.configfileVersion < configVersion)
                 {
                     Console.WriteLine("Updating Config File, Please Edit to see what changed.");
-                    File.WriteAllText("duckdns_config.json", JsonConvert.SerializeObject(set, Formatting.Indented));
+                    File.WriteAllText(CONFIG_PATH, JsonConvert.SerializeObject(set, Formatting.Indented));
                 }
                 else if (set.configfileVersion > configVersion)
                 {
@@ -100,7 +105,7 @@ namespace DuckDNS
         static async void ForceUpdate()
         {
             Console.WriteLine("Reloading Config...");
-            set = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("duckdns_config.json"));
+            set = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(CONFIG_PATH));
             Console.WriteLine("Reload Complete!");
             foreach (var p in set.sites)
             {
@@ -155,7 +160,7 @@ namespace DuckDNS
             temp.Domain = "domain3";
             temp.Token = "token2";
             set.sites.Add(temp);
-            File.WriteAllText("duckdns_config.json", JsonConvert.SerializeObject(set, Formatting.Indented));
+            File.WriteAllText(CONFIG_PATH, JsonConvert.SerializeObject(set, Formatting.Indented));
             Console.WriteLine("Created Default Configuration file, \"duckdns_config.json\", you should edit it to have your domains and tokens.");
             Console.ReadKey();
             Environment.Exit(1);
